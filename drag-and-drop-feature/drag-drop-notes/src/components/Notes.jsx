@@ -1,4 +1,4 @@
-import React, { useRef, createRef } from "react";
+import React, { useRef, createRef, useState } from "react";
 import { useEffect } from "react";
 
 // import Note from "./components/Note.jsx";
@@ -6,17 +6,22 @@ import Note from "./Note";
 
 function Notes({ notes = [], setNotes = () => {} }) {
   const noteRefs = useRef([]);
-  console.log(noteRefs);
+  console.log(notes);
+
+  // const [savedNotes, setSavedNotes] = useState([]);
+  // console.log(noteRefs);
+  /*
   useEffect(() => {
     //localstorage logic
+
     // const savedNotes = [];
-    console.log(notes, "notes");
+    // console.log(notes, "notes");
     // savedNotes -  modified notes by adding position.
     const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
+
     console.log(savedNotes, "savedNotes");
     // updatedNotes - modified notes by adding position. Finally updating notes with position and saving in setNotes(state mgmt)
     const updatedNotes = notes.map((note) => {
-      // const savedNote = null;
       const savedNote = savedNotes.find((n) => n.id === note.id);
       console.log(savedNote, "savedNote");
 
@@ -25,12 +30,51 @@ function Notes({ notes = [], setNotes = () => {} }) {
         return { ...note, position: savedNote.position };
       } else {
         const position = determineNewPosition();
+        // Save the new note to local storage
+        localStorage.setItem(
+          "notes",
+          JSON.stringify([...savedNotes, { ...note, position }])
+        );
         return { ...note, position };
       }
     });
     setNotes(updatedNotes);
     console.log(updatedNotes, "updatedNotes");
+    // localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    // console.log(
+    //   JSON.parse(localStorage.getItem("notes")),
+    //   "localstorage updated?"
+    // );
+    console.log(notes.length, "notes.length");
+    console.log(savedNotes, "savedNotes again checking");
+  }, [notes.length]);
+  */
+
+  // useEffect(() => {
+  //   localStorage.setItem("notes", JSON.stringify(notes));
+  // }, [notes]);
+
+  useEffect(() => {
+    // localstorage logic
+    const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
+
+    const updatedNotes = notes.map((note) => {
+      const savedNote = savedNotes.find((n) => n.id === note.id);
+      if (savedNote) {
+        console.log(savedNote, "if");
+        return { ...note, position: savedNote.position };
+      } else {
+        console.log(savedNote, "else");
+        const position = determineNewPosition();
+        console.log({ ...note, position });
+        return { ...note, position };
+      }
+    });
+
+    setNotes(updatedNotes);
+    console.log(updatedNotes, "updatedNotes");
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    console.log(notes.length);
   }, [notes.length]);
 
   const determineNewPosition = () => {
@@ -68,7 +112,7 @@ function Notes({ notes = [], setNotes = () => {} }) {
       const newPosition = { x: finalRect.left, y: finalRect.top };
       updateNotePosition(id, newPosition);
 
-      // check for overlap
+      // TODO:check for overlap
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -82,6 +126,7 @@ function Notes({ notes = [], setNotes = () => {} }) {
     setNotes(updatedNotes);
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
   };
+
   return (
     <div>
       {/* <Notes /> */}
